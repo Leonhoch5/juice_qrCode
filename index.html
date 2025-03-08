@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Codee</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    input { padding: 10px; width: 300px; margin-bottom: 20px; }
+    #qrCodeContainer { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>QR Code</h1>
+  <input type="text" id="urlInput" placeholder="Enter website URL" oninput="generateQR()">
+  <br>
+  <div id="qrCodeContainer"></div>
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script>
+    const qrCode = new QRCodeStyling({
+      width: 400,
+      height: 400,
+      data: "",
+      image: "/download.png",
+      dotsOptions: {
+        color: "#28a745",
+        type: "circle"
+      },
+      backgroundOptions: {
+        color: "#ffffff"
+      },
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 10,
+        imageSize: 0.6
+      }
+    });
+
+    qrCode.append(document.getElementById("qrCodeContainer"));
+
+    function generateQR() {
+      const url = document.getElementById("urlInput").value;
+      if (url) {
+        qrCode.update({ data: url });
+      } else {
+        qrCode.update({ data: "" });
+      }
+    }
+  </script>
+</body>
+</html>
