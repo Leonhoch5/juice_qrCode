@@ -19,13 +19,11 @@
 
   <script>
     document.getElementById("ticketForm").addEventListener("submit", function (event) {
-      event.preventDefault(); // Prevent form submission
+      event.preventDefault();
 
-      // Get form data
       const name = encodeURIComponent(document.getElementById("name").value);
       const phone = encodeURIComponent(document.getElementById("phone").value);
 
-      // Redirect to the ticket page with data as URL parameters
       window.location.href = `ticket.html?name=${name}&phone=${phone}`;
     });
   </script>
