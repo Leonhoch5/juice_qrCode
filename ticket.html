@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Ticket</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    #ticketData { margin: 20px; font-size: 1.2em; }
+    #qrCodeContainer { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Your Ticket</h1>
+  <div id="ticketData">
+    <p><strong>Name:</strong> <span id="ticketName"></span></p>
+    <p><strong>Phone:</strong> <span id="ticketPhone"></span></p>
+  </div>
+  <div id="qrCodeContainer"></div>
+
+  <!-- Include qr-code-styling library -->
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script>
+    // Get data from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = decodeURIComponent(urlParams.get("name") || "");
+    const phone = decodeURIComponent(urlParams.get("phone") || "");
+
+    // Display ticket data
+    document.getElementById("ticketName").textContent = name;
+    document.getElementById("ticketPhone").textContent = phone;
+
+    // Initialize QR Code Styling
+    const qrCode = new QRCodeStyling({
+      width: 400,
+      height: 400,
+      data: window.location.href, // Ticket URL with data
+      image: "download.png", // Image in the center (optional)
+      dotsOptions: {
+        color: "#28a745", // Green QR code
+        type: "square" // Square dots
+      },
+      backgroundOptions: {
+        color: "#ffffff" // White background
+      },
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 10, // Margin around the image
+        imageSize: 0.4 // Image size (40% of QR code size)
+      }
+    });
+
+    // Append QR code to the container
+    qrCode.append(document.getElementById("qrCodeContainer"));
+  </script>
+</body>
+</html>

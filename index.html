@@ -3,49 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Code</title>
+  <title>Create Ticket</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    input { padding: 10px; width: 300px; margin-bottom: 20px; }
-    #qrCodeContainer { margin-top: 20px; }
+    input, button { padding: 10px; margin: 5px; width: 300px; }
   </style>
 </head>
 <body>
-  <h1>QR Code</h1>
-  <input type="text" id="urlInput" placeholder="Enter website URL" oninput="generateQR()">
-  <br>
-  <div id="qrCodeContainer"></div>
-  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <h1>Create a Ticket</h1>
+  <form id="ticketForm">
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+    <button type="submit">Generate Ticket</button>
+  </form>
+
   <script>
-    const qrCode = new QRCodeStyling({
-      width: 400,
-      height: 400,
-      data: "",
-      image: "download.png",
-      dotsOptions: {
-        color: "#28a745",
-        type: "square"
-      },
-      backgroundOptions: {
-        color: "#ffffff"
-      },
-      imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 10,
-        imageSize: 0.4
-      }
+    document.getElementById("ticketForm").addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Get form data
+      const name = encodeURIComponent(document.getElementById("name").value);
+      const phone = encodeURIComponent(document.getElementById("phone").value);
+
+      // Redirect to the ticket page with data as URL parameters
+      window.location.href = `ticket.html?name=${name}&phone=${phone}`;
     });
-
-    qrCode.append(document.getElementById("qrCodeContainer"));
-
-    function generateQR() {
-      const url = document.getElementById("urlInput").value;
-      if (url) {
-        qrCode.update({ data: url });
-      } else {
-        qrCode.update({ data: "" });
-      }
-    }
   </script>
 </body>
 </html>
