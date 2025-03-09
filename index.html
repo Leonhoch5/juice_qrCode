@@ -5,19 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Ticket</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    input, button { padding: 10px; margin: 5px; width: 300px; }
+    @import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
+    :root {
+      --background: #fff;
+      --foreground: #000;
+    }
+    body {
+      font-family: "Jersey 25", sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .form-container {
+      display: flex;
+      justify-content: space-between;
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .form {
+      width: 45%;
+    }
+    .map-container {
+      width: 50%;
+      height: 400px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 5px;
+      width: 100%;
+      font-family: "Jersey 25", sans-serif;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
   </style>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
   <h1>Create a Ticket</h1>
-  <form id="ticketForm">
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <input type="tel" id="phone" placeholder="Enter your phone number" required>
-    <button type="submit">Generate Ticket</button>
-  </form>
+  <div class="form-container">
+    <div class="form">
+      <form id="ticketForm">
+        <input type="text" id="name" placeholder="Enter your name" required>
+        <input type="tel" id="phone" placeholder="Enter your phone number" required>
+        <input type="date" id="eventDate" min="2024-04-05" max="2024-04-11" required>
+        <select id="timeBlock" required>
+          <option value="" disabled selected>Select time block</option>
+          <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+          <option value="Afternoon (1 PM - 5 PM)">Afternoon (1 PM - 5 PM)</option>
+          <option value="Evening (6 PM - 9 PM)">Evening (6 PM - 9 PM)</option>
+        </select>
+        <button type="submit">Generate Ticket</button>
+      </form>
+    </div>
+    <div class="map-container" id="map"></div>
+  </div>
 
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    // Initialize the map
+    const map = L.map('map').setView([31.2304, 121.4737], 12); // Default to Shanghai coordinates
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add markers for locations
+    const bottleDreamLocation = [31.2183, 121.4167]; // Coordinates for Bottle Dream
+    const sparkLabsLocation = [31.1704, 121.4309]; // Coordinates for SparkLabs
+
+    const bottleDreamMarker = L.marker(bottleDreamLocation).addTo(map)
+      .bindPopup("Bottle Dream - April 4 - 8th<br>上海市长宁区利西路143号");
+
+    const sparkLabsMarker = L.marker(sparkLabsLocation).addTo(map)
+      .bindPopup("SparkLabs - April 8th - 11th<br>漕河泾开发区公园-东门 上海市徐汇区平果路与桂果路交叉口正南方向33米左右");
+
+    // Function to update the map based on the selected date
+    function updateMap(selectedDate) {
+      const date = new Date(selectedDate);
+      const cutoffDate = new Date("2024-04-08");
+
+      if (date < cutoffDate) {
+        map.setView(bottleDreamLocation, 15); // Zoom to Bottle Dream
+        bottleDreamMarker.openPopup();
+      } else {
+        map.setView(sparkLabsLocation, 15); // Zoom to SparkLabs
+        sparkLabsMarker.openPopup();
+      }
+    }
+
+    // Event listener for date input
+    document.getElementById("eventDate").addEventListener("change", function () {
+      const selectedDate = this.value;
+      updateMap(selectedDate);
+    });
+
+    // Encrypt and submit form data
     async function encryptData(data, key) {
       const encoder = new TextEncoder();
       const encodedData = encoder.encode(data);
@@ -46,10 +148,18 @@
       event.preventDefault();
       const name = document.getElementById("name").value;
       const phone = document.getElementById("phone").value;
-      const data = JSON.stringify({ name, phone });
+      const eventDate = document.getElementById("eventDate").value;
+      const timeBlock = document.getElementById("timeBlock").value;
+
+      // Combine data into a single object
+      const data = JSON.stringify({ name, phone, eventDate, timeBlock });
+
+      // Encrypt the data
       const key = await generateKey();
       const encryptedData = await encryptData(data, key);
       const exportedKey = await exportKey(key);
+
+      // Redirect to the ticket page with encrypted data and key
       window.location.href = `ticket.html?data=${encodeURIComponent(encryptedData)}&key=${encodeURIComponent(exportedKey)}`;
     });
   </script>
