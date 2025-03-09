@@ -55,7 +55,6 @@
       background-color: #218838;
     }
   </style>
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
@@ -77,49 +76,33 @@
     </div>
     <div class="map-container" id="map"></div>
   </div>
-
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // Initialize the map
-    const map = L.map('map').setView([31.2304, 121.4737], 12); // Default to Shanghai coordinates
-
-    // Add OpenStreetMap tiles
+    const map = L.map('map').setView([31.2304, 121.4737], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
-
-    // Add markers for locations
-    const bottleDreamLocation = [31.2183, 121.4167]; // Coordinates for Bottle Dream
-    const sparkLabsLocation = [31.1704, 121.4309]; // Coordinates for SparkLabs
-
+    const bottleDreamLocation = [31.2183, 121.4167];
+    const sparkLabsLocation = [31.1704, 121.4309];
     const bottleDreamMarker = L.marker(bottleDreamLocation).addTo(map)
       .bindPopup("Bottle Dream - April 4 - 8th<br>上海市长宁区利西路143号");
-
     const sparkLabsMarker = L.marker(sparkLabsLocation).addTo(map)
       .bindPopup("SparkLabs - April 8th - 11th<br>漕河泾开发区公园-东门 上海市徐汇区平果路与桂果路交叉口正南方向33米左右");
-
-    // Function to update the map based on the selected date
     function updateMap(selectedDate) {
       const date = new Date(selectedDate);
       const cutoffDate = new Date("2024-04-08");
-
       if (date < cutoffDate) {
-        map.setView(bottleDreamLocation, 15); // Zoom to Bottle Dream
+        map.setView(bottleDreamLocation, 15);
         bottleDreamMarker.openPopup();
       } else {
-        map.setView(sparkLabsLocation, 15); // Zoom to SparkLabs
+        map.setView(sparkLabsLocation, 15);
         sparkLabsMarker.openPopup();
       }
     }
-
-    // Event listener for date input
     document.getElementById("eventDate").addEventListener("change", function () {
       const selectedDate = this.value;
       updateMap(selectedDate);
     });
-
-    // Encrypt and submit form data
     async function encryptData(data, key) {
       const encoder = new TextEncoder();
       const encodedData = encoder.encode(data);
@@ -130,7 +113,6 @@
       );
       return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
     }
-
     async function generateKey() {
       return await crypto.subtle.generateKey(
         { name: "AES-GCM", length: 256 },
@@ -138,28 +120,20 @@
         ["encrypt", "decrypt"]
       );
     }
-
     async function exportKey(key) {
       const exported = await crypto.subtle.exportKey("raw", key);
       return btoa(String.fromCharCode(...new Uint8Array(exported)));
     }
-
     document.getElementById("ticketForm").addEventListener("submit", async function (event) {
       event.preventDefault();
       const name = document.getElementById("name").value;
       const phone = document.getElementById("phone").value;
       const eventDate = document.getElementById("eventDate").value;
       const timeBlock = document.getElementById("timeBlock").value;
-
-      // Combine data into a single object
       const data = JSON.stringify({ name, phone, eventDate, timeBlock });
-
-      // Encrypt the data
       const key = await generateKey();
       const encryptedData = await encryptData(data, key);
       const exportedKey = await exportKey(key);
-
-      // Redirect to the ticket page with encrypted data and key
       window.location.href = `ticket.html?data=${encodeURIComponent(encryptedData)}&key=${encodeURIComponent(exportedKey)}`;
     });
   </script>
